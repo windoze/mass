@@ -1,4 +1,4 @@
-package marketplace.azure.cn
+package cn.azure.marketplace
 
 import org.junit.Test
 import org.junit.runner.RunWith

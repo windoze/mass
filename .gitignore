@@ -1,3 +1,4 @@
+.DS_Store
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -26,3 +27,4 @@ nbdist/
 
 ### Misc ###
 *-home.*
+data/
