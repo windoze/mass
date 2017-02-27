@@ -4,29 +4,33 @@
 
 import json
 import sys
+import urllib2
 
-host=sys.argv[1]
-input_file=sys.argv[2]
-output_file=sys.argv[3]
+host = sys.argv[1]
+input_file = sys.argv[2]
+output_file = sys.argv[3]
 
-j=json.load(open(input_file))
+posturl = "http://%s:9200/macappsv1/app" % host
 
-docs=[x for x in j if 'ShortDescription' in x]
+j = json.load(open(input_file))
 
-keys=set(['id', 'ApplicationId','Title','ShortDescription','SmallIconUri','Publisher',"doctype"])
+docs = [x for x in j if 'ShortDescription' in x]
 
-o=open(output_file, "w")
+keys = {'id', 'ApplicationId', 'Title', 'ShortDescription', 'SmallIconUri', 'Publisher', "doctype"}
+
+o = open(output_file, "w")
 
 def p(id, obj):
-    s = '''curl -XPUT http://%s:9200/macappsv1/app/%s -d '%s'\n''' % (host, id, json.dumps(obj))
-    o.write(s)
+    req = urllib2.Request(posturl)
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor())
+    response = opener.open(req, json.dumps(obj))
+    print response.read()
 
 for doc in docs:
-    m={}
+    m = {}
     for k in doc:
         if k in keys:
-            m[k]=doc[k]
+            m[k] = doc[k]
     # Not sure why there is a "s_" prefix
-    m['id']="s_"+m['id']
+    m['id'] = "s_" + m['id']
     p(doc['id'], m)
-

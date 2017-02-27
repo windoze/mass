@@ -9,5 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "mass")
 data class MassConfiguration(
-        var urlbase: String = "http://localhost"
+        var urlbase: String = "http://localhost",
+        var token: String = "",
+        var apiVersion: String = ""
 )

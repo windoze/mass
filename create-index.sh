@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-HOST=$1
+HOST="localhost"
+
+if [ "x$1" != "x" ]; then
+    HOST="$1"
+fi
 
 curl -XDELETE "http://$HOST:9200/macappsv1"
 curl -XPOST "http://$HOST:9200/macappsv1" -d '{
