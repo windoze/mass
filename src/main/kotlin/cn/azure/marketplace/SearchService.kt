@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 /**
  * Created by Chen Xu on 2/23/2017.
@@ -57,18 +58,18 @@ class SearchService {
 
     @RequestMapping(value = "/suggest")
     fun suggest(@PathVariable index: String,
-                @RequestParam("api-version") apiVersion: String,
+                @RequestParam("api-version") apiVersion: Optional<String>,
                 @RequestBody request: SuggestRequest,
-                @RequestHeader("api-key") token: String?): Map<String, Any> {
+                @RequestHeader("api-key") token: Optional<String>): Map<String, Any> {
         // Skip token checking if it's not specified in config
         if(config.token.isNotBlank()) {
-            if(token==null || token.trim().compareTo(config.token,true)!=0) {
+            if(!token.isPresent || token.get().trim().compareTo(config.token,true)!=0) {
                 throw AccessDeniedException()
             }
         }
         // Skip API version checking if it's not specified in config
         if(config.apiVersion.isNotBlank()) {
-            if(apiVersion!=config.apiVersion) {
+            if(!apiVersion.isPresent || apiVersion.get()!=config.apiVersion) {
                 throw UnsupportedAPIVersionException()
             }
         }
@@ -122,9 +123,22 @@ class SearchService {
 
     @RequestMapping(value = "/search")
     fun search(@PathVariable index: String,
-               @RequestParam("api-version") apiVersion: String,
+               @RequestParam("api-version") apiVersion: Optional<String>,
                @RequestBody request: SearchRequest,
-               @RequestHeader("api-key") token: String?): Map<String, Any> {
+               @RequestHeader("api-key") token: Optional<String>): Map<String, Any> {
+
+        // Skip token checking if it's not specified in config
+        if(config.token.isNotBlank()) {
+            if(!token.isPresent || token.get().trim().compareTo(config.token,true)!=0) {
+                throw AccessDeniedException()
+            }
+        }
+        // Skip API version checking if it's not specified in config
+        if(config.apiVersion.isNotBlank()) {
+            if(!apiVersion.isPresent || apiVersion.get()!=config.apiVersion) {
+                throw UnsupportedAPIVersionException()
+            }
+        }
 
         val q: QueryBuilder = if (request.queryType.trim().compareTo("simple", true) == 0) {
             val query = simpleQueryStringQuery(request.search)
